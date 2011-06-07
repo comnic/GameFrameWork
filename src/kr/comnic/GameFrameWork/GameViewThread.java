@@ -26,6 +26,7 @@ public class GameViewThread extends Thread {
 		while(m_run){
 			_canvas = null;
 			try{
+				m_gameView.Update();
 				_canvas = m_surfaceHolder.lockCanvas(null);
 				synchronized(m_surfaceHolder){
 					m_gameView.OnDraw(_canvas);
