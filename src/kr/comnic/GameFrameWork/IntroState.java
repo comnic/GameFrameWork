@@ -31,7 +31,7 @@ public class IntroState implements IState {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		// TODO Auto-generated method stub
-		AppManager.getInstance().getGameView().ChangeGameState(new CreditState());
+		AppManager.getInstance().getGameView().ChangeGameState(new kr.comnic.FirstGame.GameState());
 		return true;
 	}
 

@@ -13,10 +13,9 @@ public class GameViewThread extends Thread {
 	public GameViewThread(SurfaceHolder surfaceHolder, GameView gameView){
 		m_surfaceHolder = surfaceHolder;
 		m_gameView = gameView;
-		;
 	}
 	
-	public void setRunnung(boolean run){
+	public void setRunning(boolean run){
 		m_run = run;
 	}
 	
