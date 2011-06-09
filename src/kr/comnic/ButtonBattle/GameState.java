@@ -14,12 +14,16 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 public class GameState implements IState {
-	private int m_score;
-	private int m_limitTime;
-	private int m_life;
+	private int m_score = 0;
+	private int m_limitTime = 30;
+	private int m_curTime = 0;
+	private int m_life = 15;
+	
 	private long m_startGameTime;
 	private long m_curGameTime;
-	private boolean m_isClear;
+	
+	private boolean m_isClear = false;
+	private boolean m_isFail = false;
 	
 	private GraphicObject m_BtnGreen;
 	private GraphicObject m_BtnRed;
@@ -36,6 +40,8 @@ public class GameState implements IState {
 	private GraphicObject m_numYellow[];
 	private GraphicObject m_numGreen[];
 
+	private GraphicObject m_numBlack[];
+	private GraphicObject m_numMinus;
 
 	private GraphicObject m_background;
 	private ButtonItem m_bi[][];
@@ -48,15 +54,32 @@ public class GameState implements IState {
 	@Override
 	public void Init() {
 		// TODO Auto-generated method stub
+		/*
 		m_isClear = false;
+		m_isFail = false;
 		
 		m_score = 0;
 		m_limitTime = 30;
 		m_life = 15;
+		*/
 		
 		m_startGameTime = System.currentTimeMillis();
 		
 		m_background = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.background));
+
+		m_numBlack = new GraphicObject[10];
+		m_numBlack[0] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.n0));
+		m_numBlack[1] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.n1));
+		m_numBlack[2] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.n2));
+		m_numBlack[3] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.n3));
+		m_numBlack[4] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.n4));
+		m_numBlack[5] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.n5));
+		m_numBlack[6] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.n6));
+		m_numBlack[7] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.n7));
+		m_numBlack[8] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.n8));
+		m_numBlack[9] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.n9));		
+
+		m_numMinus = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.minus));
 		
 		m_BtnGreen = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.btn_green));
 		m_BtnRed = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.btn_red));
@@ -210,11 +233,14 @@ public class GameState implements IState {
 	@Override
 	public void Update() {
 		// TODO Auto-generated method stub
-		if(!m_isClear){
-			isClear();
+		if(m_curTime < -99 || m_life < -99)
+			m_isFail = true;
+		
+		if(!m_isClear && !m_isFail){
+			if(isClear())
+				AppManager.getInstance().getGameView().ChangeGameState(new ClearState());
 			m_curGameTime = System.currentTimeMillis();
 		}
-
 
 		//Log.i("Call", "Update");
 	}
@@ -286,12 +312,62 @@ public class GameState implements IState {
 	}
 	
 	private void drawInfo(Canvas canvas){
+		////////////////////////////////////////////////////////////
+		//시간을 표시한다.
+		////////////////////////////////////////////////////////////
+		m_curTime = m_limitTime - (int)((m_curGameTime - m_startGameTime)/1000);
+		String _strLeftTime = String.valueOf(m_curTime); //일단 String형으로 바꾼다.
+		drawStringNumber(canvas, _strLeftTime, 125, 86, -20);
+		
+		////////////////////////////////////////////////////////////
+		//Life를 표시한다.
+		////////////////////////////////////////////////////////////
+		drawStringNumber(canvas, String.valueOf(m_life), 263, 86, 20);
+		
+		////////////////////////////////////////////////////////////
+		//Point를 표시한다.
+		////////////////////////////////////////////////////////////		
+		drawStringNumber(canvas, String.valueOf(m_score), 380, 86, 20);
+
+		/*
 		Paint p = new Paint();
 		p.setTextSize(30);
 		p.setColor(Color.WHITE);
 		canvas.drawText(String.format("Left Time : %d", m_limitTime - (int)((m_curGameTime - m_startGameTime)/1000)), 15, 60, p);
 		canvas.drawText(String.format("Left Life : %d", m_life), 15, 90, p);
 		canvas.drawText(String.format("Score : %d", m_score), 15, 120, p);
+		*/
+	}
+	
+	public void drawStringNumber(Canvas _canvas, String _strNumber, int _offsetX, int _offsetY, int _numValue){
+		int _index;
+		int n = 0;
+		int _x, _y=_offsetY;
+		if(_numValue > 0){
+			for(int i = 0 ; i < _strNumber.length() ; i++){
+				_x = _offsetX + (_numValue*i);
+				if(String.valueOf(_strNumber.charAt(i)).equals("-")){
+					m_numMinus.setPosition(_x, _y);
+					m_numMinus.Draw(_canvas);
+				}else{
+					_index = Integer.valueOf(String.valueOf(_strNumber.charAt(i)));
+					m_numBlack[_index].setPosition(_x, _y);
+					m_numBlack[_index].Draw(_canvas);
+				}
+			}
+		}else{
+			for(int i = _strNumber.length() ; i > 0 ; i--, n++){
+				_x = _offsetX + (_numValue*n);
+				if(String.valueOf(_strNumber.charAt(i-1)).equals("-")){
+					m_numMinus.setPosition(_x, _y);
+					m_numMinus.Draw(_canvas);
+				}else{
+					_index = Integer.valueOf(String.valueOf(_strNumber.charAt(i-1)));
+					m_numBlack[_index].setPosition(_x, _y);
+					m_numBlack[_index].Draw(_canvas);
+				}
+			}
+		}
 	}
 	
 	public void addScore(int n){
