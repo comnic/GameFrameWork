@@ -66,7 +66,7 @@ public class ButtonItem {
 		case BUTTON_KIND_TIME:
 			m_kind = BUTTON_KIND_TIME;
 			m_clickCount = 5;
-			m_point = 10;
+			m_point = 0;
 			break;
 		}
 	}
@@ -94,11 +94,25 @@ public class ButtonItem {
 	}
 
 	public void click(){
+		//초록색이면 무시
 		if(m_kind == BUTTON_KIND_GREEN) return;
 		
+		//설정된 수만큼 클릭 했는지 확인.
 		if(--m_clickCount <= 0){
-			setKind(BUTTON_KIND_GREEN);
+			//주어진 점수를 더한다.
 			((GameState)AppManager.getInstance().getGameView().getGameState()).addScore(m_point);
+			
+			switch(m_kind){
+			case BUTTON_KIND_SPECIAL1:
+				((GameState)AppManager.getInstance().getGameView().getGameState()).addLife(5);
+				break;
+			case BUTTON_KIND_TIME:
+				((GameState)AppManager.getInstance().getGameView().getGameState()).addTime(10);
+				break;
+			}
+
+			//설정된 수만큼 클릭되었으면 버튼을 초록색으로 변경 한다.
+			setKind(BUTTON_KIND_GREEN);
 		}
 	}
 

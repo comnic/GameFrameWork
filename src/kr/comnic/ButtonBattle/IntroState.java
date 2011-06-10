@@ -5,6 +5,7 @@ import kr.comnic.GameFrameWork.IState;
 import kr.comnic.GameFrameWork.R;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 

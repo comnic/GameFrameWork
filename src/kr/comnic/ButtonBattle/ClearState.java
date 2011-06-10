@@ -12,8 +12,16 @@ import android.view.MotionEvent;
 
 public class ClearState implements IState {
 	
+	private int m_time, m_life, m_point;
+	
 	private GraphicObject m_background; 
 
+	public ClearState(int t, int l, int p){
+		m_time = t;
+		m_life = l;
+		m_point = p;
+	}
+	
 	@Override
 	public void Destroy() {
 		// TODO Auto-generated method stub
@@ -23,13 +31,20 @@ public class ClearState implements IState {
 	@Override
 	public void Init() {
 		// TODO Auto-generated method stub
-		m_background = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.clear_state));
+		m_background = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.clear_stage));
 	}
 
 	@Override
 	public void Render(Canvas canvas) {
 		// TODO Auto-generated method stub
 		m_background.Draw(canvas);
+		
+		Paint p = new Paint();
+		p.setTextSize(30);
+		p.setColor(Color.BLACK);
+		canvas.drawText(String.format("%ds", m_time), 141, 347, p);
+		canvas.drawText(String.valueOf(m_life), 253, 347, p);
+		canvas.drawText(String.valueOf(m_point), 366, 347, p);
 	}
 
 	@Override

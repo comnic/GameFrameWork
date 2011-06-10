@@ -19,7 +19,7 @@ public class IntroState implements IState {
 	@Override
 	public void Init() {
 		// TODO Auto-generated method stub
-		icon = AppManager.getInstance().getBitmap(R.drawable.icon);
+		icon = AppManager.getInstance().getBitmap(R.drawable.intro);
 	}
 
 	@Override

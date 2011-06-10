@@ -14,16 +14,16 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 public class GameState implements IState {
-	private int m_score = 0;
-	private int m_limitTime = 30;
-	private int m_curTime = 0;
-	private int m_life = 15;
+	private int m_score = 0;		//점수
+	private int m_limitTime = 30;	//게임에 주어진 시간
+	private int m_curTime = 0;		//남은 시간
+	private int m_life = 15;		//생명 수
 	
-	private long m_startGameTime;
-	private long m_curGameTime;
+	private long m_startGameTime;	//시작시간
+	private long m_curGameTime;		//현재시간
 	
-	private boolean m_isClear = false;
-	private boolean m_isFail = false;
+	private boolean m_isClear = false;	//게임을 클리어 했는지 유무
+	private boolean m_isFail = false;	//게임을 실패 했는지 유무
 	
 	private GraphicObject m_BtnGreen;
 	private GraphicObject m_BtnRed;
@@ -63,10 +63,13 @@ public class GameState implements IState {
 		m_life = 15;
 		*/
 		
+		//게임 시작 시간을 저장한다. 현재시간을 밀리초로 기록.
 		m_startGameTime = System.currentTimeMillis();
 		
+		//배경으로 사용될 이미지 
 		m_background = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.background));
-
+		
+		//정보(시간, 점수 등)표시할 숫자와 마이너스 기호
 		m_numBlack = new GraphicObject[10];
 		m_numBlack[0] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.n0));
 		m_numBlack[1] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.n1));
@@ -81,6 +84,7 @@ public class GameState implements IState {
 
 		m_numMinus = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.minus));
 		
+		//게임에 사용될 버튼들.
 		m_BtnGreen = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.btn_green));
 		m_BtnRed = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.btn_red));
 		m_BtnSpc1 = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.btn_special001));
@@ -91,6 +95,7 @@ public class GameState implements IState {
 		m_BtnStar = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.btn_star));
 		m_BtnTime = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.btn_time));
 		
+		//버튼 아래게 표시될 누름 횟수 표시용.
 		m_numBlue = new GraphicObject[10];
 		m_numBlue[0] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.blue_0));
 		m_numBlue[1] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.blue_1));
@@ -139,17 +144,39 @@ public class GameState implements IState {
 		m_numGreen[8] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.green_8));
 		m_numGreen[9] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.green_9));
 		
+		/* ButtonItem배열
+			[0,0,0,0,0,0,0]
+			[0,0,0,0,0,0,0]
+			[0,0,0,0,0,0,0]
+			[0,0,0,0,0,0,0]
+			[0,0,0,0,0,0,0]
+			[0,0,0,0,0,0,0]
+			[0,0,0,0,0,0,0]
+			[0,0,0,0,0,0,0]
+			[0,0,0,0,0,0,0]
+			[0,0,0,0,0,0,0]
+		 * 
+		 */
 		m_bi = new ButtonItem[9][7];
 		
+		//ButtonItem배열을 초기화 한다.
+		//해당위치에 표시될 버튼으르 랜덤으로 설정한다.
 		initButtonItem();
 	}
 
 	@Override
 	public void Render(Canvas canvas) {
 		// TODO Auto-generated method stub
+		
+		//배경을 먼저 그린다.
 		m_background.Draw(canvas);
+		
+		//정보를 그린다.
 		drawInfo(canvas);
 		
+		/*
+		 * 배열 크기만큼 버튼들을 속성에 맞게 그린다.
+		 */
 		int __x, __y;
 		__x = __y = 0;
 		int __x2, __y2;
@@ -233,12 +260,15 @@ public class GameState implements IState {
 	@Override
 	public void Update() {
 		// TODO Auto-generated method stub
+		
+		//-99초와 -99생명이면 게임을 더이상 진행하지 않는다.
+		//나중에 실패 메시지용 State가 필요할 듯.
 		if(m_curTime < -99 || m_life < -99)
 			m_isFail = true;
 		
 		if(!m_isClear && !m_isFail){
 			if(isClear())
-				AppManager.getInstance().getGameView().ChangeGameState(new ClearState());
+				AppManager.getInstance().getGameView().ChangeGameState(new ClearState(m_curTime, m_life, m_score));
 			m_curGameTime = System.currentTimeMillis();
 		}
 
@@ -254,15 +284,23 @@ public class GameState implements IState {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		// TODO Auto-generated method stub
-		if(event.getPointerCount() > 1){
+		
+		/*
+		 * 멀티터치용으로 만들었는데 잘 안 되는 듯.
+		 * Test가 필요함.
+		 */
+		if(event.getPointerCount() > 1){	//1보다 크면 멀티터치로 인식
+			//첫번째 터치 처리
 			float _x = event.getX(0);
 			float _y = event.getY(0);
 			clickProcess(_x, _y);
 
+			//두번째 터치 처리
 			_x = event.getX(1);
 			_y = event.getY(1);
 			clickProcess(_x, _y);			
-		}else{
+		}else{								//멀티터치가 아닐때
+			//터치 처리
 			float _x = event.getX();
 			float _y = event.getY();
 			
@@ -271,6 +309,9 @@ public class GameState implements IState {
 		return false;
 	}
 	
+	/*
+	 * 클릭된 좌표를 값으로 버튼 클릭을 처리한다.
+	 */
 	private void clickProcess(float _x, float _y){
 		if(_x < 15 || _x > 462) return ;
 		if(_y < 185 || _y > 760) return ;
@@ -306,7 +347,7 @@ public class GameState implements IState {
 		
 		for(int y = 0 ; y < 9 ; y++){
 			for(int x = 0 ; x < 7 ; x++){				
-				m_bi[y][x] = new ButtonItem(rand.nextInt(8));
+				m_bi[y][x] = new ButtonItem(rand.nextInt(9));
 			}
 		}		
 	}
@@ -374,4 +415,13 @@ public class GameState implements IState {
 		m_score += n;
 	}
 
+	public void addLife(int n){
+		m_life += n;
+		Log.i("Game Info", String.format("m_life : %d", m_life));
+	}
+
+	public void addTime(int n){
+		m_limitTime += n;
+		Log.i("Game Info", String.format("m_limitTime : %d", m_limitTime));
+	}
 }

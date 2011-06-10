@@ -31,7 +31,7 @@ public final class R {
         public static final int btn_special005=0x7f020011;
         public static final int btn_star=0x7f020012;
         public static final int btn_time=0x7f020013;
-        public static final int clear_state=0x7f020014;
+        public static final int clear_stage=0x7f020014;
         public static final int gray_0=0x7f020015;
         public static final int gray_1=0x7f020016;
         public static final int gray_2=0x7f020017;
