@@ -9,6 +9,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.TableLayout;
 
 public class ClearState implements IState {
 	
@@ -38,6 +40,9 @@ public class ClearState implements IState {
 	public void Render(Canvas canvas) {
 		// TODO Auto-generated method stub
 		m_background.Draw(canvas);
+		
+		//TableLayout m_rankLayout = (TableLayout) AppManager.getInstance().getGameView().findViewById(R.id.rankLayout);
+		//m_rankLayout.setVisibility(View.VISIBLE);
 		
 		Paint p = new Paint();
 		p.setTextSize(30);

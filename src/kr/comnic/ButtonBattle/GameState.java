@@ -7,8 +7,6 @@ import kr.comnic.GameFrameWork.GraphicObject;
 import kr.comnic.GameFrameWork.IState;
 import kr.comnic.GameFrameWork.R;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -324,6 +322,7 @@ public class GameState implements IState {
 		
 		try{
 			if(m_bi[_indexY][_indexX].getKind() == ButtonItem.BUTTON_KIND_GREEN){
+				AppManager.getInstance().getGameView().Vibrate(100);
 				m_life -= 1;
 			}else
 				m_bi[_indexY][_indexX].click();

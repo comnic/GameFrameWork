@@ -1,5 +1,6 @@
 package kr.comnic.GameFrameWork;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,6 +8,7 @@ import android.graphics.BitmapFactory;
 public class AppManager {
 	private static AppManager s_instance;
 	
+	private Context m_context;
 	private GameView m_gameview;
 	private Resources m_resources;
 	
@@ -14,6 +16,10 @@ public class AppManager {
 		if(s_instance == null)
 			s_instance = new AppManager();
 		return s_instance;
+	}
+
+	void setContext(Context _context){
+		m_context = _context;
 	}
 	
 	void setGameView(GameView _gameview){
@@ -24,6 +30,10 @@ public class AppManager {
 		m_resources = _resource;
 	}
 	
+	public Context getContext(){
+		return m_context;
+	}
+
 	public GameView getGameView(){
 		return m_gameview;
 	}

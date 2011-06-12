@@ -2,6 +2,7 @@ package kr.comnic.GameFrameWork;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.os.Vibrator;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -9,6 +10,7 @@ import android.view.SurfaceView;
 
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
+	private Vibrator m_vibrator;
 
 	private GameViewThread m_thread;
 	
@@ -22,7 +24,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		// TODO Auto-generated constructor stub
 		
 		setFocusable(true);
+		m_vibrator = (Vibrator)context.getSystemService(Context.VIBRATOR_SERVICE);
 		
+		AppManager.getInstance().setContext(context);
 		AppManager.getInstance().setGameView(this);
 		AppManager.getInstance().setResources(getResources());
 		
@@ -65,6 +69,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		}
 		
+	}
+	
+	public void Vibrate(long milliseconds){
+		m_vibrator.vibrate(milliseconds);
 	}
 	
 	public void Update(){
