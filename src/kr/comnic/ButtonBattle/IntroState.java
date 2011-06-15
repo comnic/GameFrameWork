@@ -5,6 +5,7 @@ import kr.comnic.GameFrameWork.IState;
 import kr.comnic.GameFrameWork.R;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,7 +21,6 @@ public class IntroState implements IState {
 	@Override
 	public void Destroy() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -48,6 +48,7 @@ public class IntroState implements IState {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		// TODO Auto-generated method stub
+		Log.i("Game Info", "onTouchEvent!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		AppManager.getInstance().getGameView().ChangeGameState(new GameState());
 		return true;
 	}

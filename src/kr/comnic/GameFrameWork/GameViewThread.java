@@ -7,6 +7,7 @@ public class GameViewThread extends Thread {
 
 	private SurfaceHolder m_surfaceHolder;
 	private GameView m_gameView;
+	private boolean m_update = true;
 	
 	private boolean m_run = false;
 	
@@ -25,15 +26,25 @@ public class GameViewThread extends Thread {
 		while(m_run){
 			_canvas = null;
 			try{
-				m_gameView.Update();
-				_canvas = m_surfaceHolder.lockCanvas(null);
-				synchronized(m_surfaceHolder){
-					m_gameView.OnDraw(_canvas);
+				if(m_update){
+					m_gameView.Update();
+					_canvas = m_surfaceHolder.lockCanvas(null);
+					synchronized(m_surfaceHolder){
+						m_gameView.OnDraw(_canvas);
+					}
 				}
 			}finally{
 				if(_canvas != null)
 					m_surfaceHolder.unlockCanvasAndPost(_canvas);
 			}
 		}
+	}
+
+	public void setUpdate(boolean m_update) {
+		this.m_update = m_update;
+	}
+
+	public boolean isUpdate() {
+		return m_update;
 	}
 }

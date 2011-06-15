@@ -7,11 +7,17 @@ import kr.comnic.GameFrameWork.GraphicObject;
 import kr.comnic.GameFrameWork.IState;
 import kr.comnic.GameFrameWork.R;
 import android.graphics.Canvas;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.LinearLayout;
 
 public class GameState implements IState {
+	private final int GAME_INIT_MODE_ALL = 0;
+	private final int GAME_INIT_MODE_GREEN = 1;
+	
 	private int m_score = 0;		//점수
 	private int m_limitTime = 30;	//게임에 주어진 시간
 	private int m_curTime = 0;		//남은 시간
@@ -20,8 +26,10 @@ public class GameState implements IState {
 	private long m_startGameTime;	//시작시간
 	private long m_curGameTime;		//현재시간
 	
+	private boolean m_isInitGame = false;
 	private boolean m_isClear = false;	//게임을 클리어 했는지 유무
 	private boolean m_isFail = false;	//게임을 실패 했는지 유무
+	private boolean m_isGameOver = false;
 	
 	private GraphicObject m_BtnGreen;
 	private GraphicObject m_BtnRed;
@@ -49,8 +57,17 @@ public class GameState implements IState {
 		// TODO Auto-generated method stub
 	}
 
+	public GameState(){
+		Log.i("Game Info", "GameState GameState()");
+	}
+	public GameState(int _baseScore){
+		Log.i("Game Info", "GameState GameState(int)");
+		m_score = _baseScore;
+	}
+	
 	@Override
 	public void Init() {
+		Log.i("Game Info", "GameState Init()");
 		// TODO Auto-generated method stub
 		/*
 		m_isClear = false;
@@ -60,6 +77,17 @@ public class GameState implements IState {
 		m_limitTime = 30;
 		m_life = 15;
 		*/
+		
+		m_isInitGame = false;
+		m_isClear = false;	//게임을 클리어 했는지 유무
+		m_isFail = false;	//게임을 실패 했는지 유무
+		m_isGameOver = false;
+
+		m_bi = new ButtonItem[9][7];
+		
+		//ButtonItem배열을 초기화 한다.
+		//해당위치에 표시될 버튼으르 랜덤으로 설정한다.
+		initButtonItem(GAME_INIT_MODE_ALL);
 		
 		//게임 시작 시간을 저장한다. 현재시간을 밀리초로 기록.
 		m_startGameTime = System.currentTimeMillis();
@@ -155,11 +183,6 @@ public class GameState implements IState {
 			[0,0,0,0,0,0,0]
 		 * 
 		 */
-		m_bi = new ButtonItem[9][7];
-		
-		//ButtonItem배열을 초기화 한다.
-		//해당위치에 표시될 버튼으르 랜덤으로 설정한다.
-		initButtonItem();
 	}
 
 	@Override
@@ -189,6 +212,7 @@ public class GameState implements IState {
 				__x2 = __x + 44;
 				__y2 = __y + 44;
 				
+		try{
 				if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_GREEN){
 					m_BtnGreen.setPosition(__x, __y);
 					m_BtnGreen.Draw(canvas);
@@ -251,6 +275,11 @@ public class GameState implements IState {
 
 				}				
 				else continue;
+			
+		}catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 			}
 		}
 	}
@@ -258,21 +287,54 @@ public class GameState implements IState {
 	@Override
 	public void Update() {
 		// TODO Auto-generated method stub
-		
-		//-99초와 -99생명이면 게임을 더이상 진행하지 않는다.
-		//나중에 실패 메시지용 State가 필요할 듯.
-		if(m_curTime < -99 || m_life < -99)
-			m_isFail = true;
-		
-		if(!m_isClear && !m_isFail){
-			if(isClear())
+		if(m_isInitGame){
+			m_curTime = m_limitTime - (int)((m_curGameTime - m_startGameTime)/1000);
+	
+			//특정시간마다 그린색을 다시 다른 색으로 바꿔 준다.
+			if(m_isInitGame && ((m_curGameTime/1000) % 5) == 0)
+				initButtonItem(GAME_INIT_MODE_GREEN);
+	
+			if(m_isGameOver){
+				GameOver();
+			}else if(m_isClear){
+				Log.i("Game Info", "Clear!!");
 				AppManager.getInstance().getGameView().ChangeGameState(new ClearState(m_curTime, m_life, m_score));
-			m_curGameTime = System.currentTimeMillis();
-		}
+			}else if(m_isFail){
+				Log.i("Game Info", "Game Over!!");
+				//임시로...
+				AppManager.getInstance().getGameView().ChangeGameState(new ClearState(m_curTime, m_life, m_score));
 
+				/*
+				Message msg = new Message();
+				msg.what = 0;
+				AppManager.getInstance().getHandler().sendMessageAtFrontOfQueue(msg);
+				*/
+			}else{
+				Log.i("Game Info", "Continue!!");
+				m_isClear = isClear();
+	
+				if(m_curTime <= 0 || m_life <= 0)
+					m_isFail = true;
+	
+				m_curGameTime = System.currentTimeMillis();
+			}
+		}
 		//Log.i("Call", "Update");
 	}
 
+	public void GameOver(){
+		//ranking대상이면
+		if(false){
+	        //Intent clsIntent = new Intent(AppManager.getInstance().getContext(), ClearActivity.class );
+	        //AppManager.getInstance().getContext().startActivity(clsIntent);
+			final LinearLayout linear = (LinearLayout)View.inflate(AppManager.getInstance().getContext(), R.layout.rank_input, null);
+			linear.setVisibility(View.VISIBLE);
+			;
+		}else{
+			
+		}
+	}
+	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
@@ -323,7 +385,8 @@ public class GameState implements IState {
 		try{
 			if(m_bi[_indexY][_indexX].getKind() == ButtonItem.BUTTON_KIND_GREEN){
 				AppManager.getInstance().getGameView().Vibrate(100);
-				m_life -= 1;
+				if(m_life > 0)	//마지막에 -1로 표시되지 않게 하기 위해.
+					m_life -= 1;
 			}else
 				m_bi[_indexY][_indexX].click();
 		}catch (Exception e) {
@@ -333,29 +396,38 @@ public class GameState implements IState {
 	}
 	
 	private boolean isClear(){
-		for(int y = 0 ; y < 9 ; y++)
-			for(int x = 0 ; x < 7 ; x++)
-				if(m_bi[y][x].getKind() != ButtonItem.BUTTON_KIND_GREEN)
-					return false;		
-		m_isClear = true;
+		if(m_isInitGame){
+			for(int y = 0 ; y < 9 ; y++)
+				for(int x = 0 ; x < 7 ; x++)
+					if(m_bi[y][x] != null && m_bi[y][x].getKind() != ButtonItem.BUTTON_KIND_GREEN)
+						return false;		
+			m_isClear = true;
+		}
 		return true;
 	}
 	
-	private void initButtonItem(){
+	private void initButtonItem(int _mode){
 		Random rand = new Random();
 		
 		for(int y = 0 ; y < 9 ; y++){
-			for(int x = 0 ; x < 7 ; x++){				
-				m_bi[y][x] = new ButtonItem(rand.nextInt(9));
+			for(int x = 0 ; x < 7 ; x++){
+				if(_mode == GAME_INIT_MODE_GREEN){
+					if(m_bi[y][x] != null)
+						if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_GREEN)
+							m_bi[y][x] = new ButtonItem(rand.nextInt(9));
+				}else if(_mode == GAME_INIT_MODE_ALL){
+					m_bi[y][x] = new ButtonItem(rand.nextInt(9));
+				}
 			}
-		}		
+		}
+		//button이 다 만들어 졌다.
+		m_isInitGame = true;
 	}
-	
+
 	private void drawInfo(Canvas canvas){
 		////////////////////////////////////////////////////////////
 		//시간을 표시한다.
 		////////////////////////////////////////////////////////////
-		m_curTime = m_limitTime - (int)((m_curGameTime - m_startGameTime)/1000);
 		String _strLeftTime = String.valueOf(m_curTime); //일단 String형으로 바꾼다.
 		drawStringNumber(canvas, _strLeftTime, 125, 86, -20);
 		

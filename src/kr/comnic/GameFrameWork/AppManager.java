@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
 
 public class AppManager {
 	private static AppManager s_instance;
@@ -11,6 +12,7 @@ public class AppManager {
 	private Context m_context;
 	private GameView m_gameview;
 	private Resources m_resources;
+	private Handler m_handler;
 	
 	public static AppManager getInstance(){
 		if(s_instance == null)
@@ -44,5 +46,13 @@ public class AppManager {
 	
 	public Bitmap getBitmap(int r){
 		return BitmapFactory.decodeResource(m_resources, r);
+	}
+
+	public void setHandler(Handler m_handler) {
+		this.m_handler = m_handler;
+	}
+
+	public Handler getHandler() {
+		return m_handler;
 	}
 }

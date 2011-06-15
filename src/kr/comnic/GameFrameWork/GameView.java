@@ -1,23 +1,25 @@
 package kr.comnic.GameFrameWork;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
+import android.view.View;
+import android.widget.LinearLayout;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	private Vibrator m_vibrator;
-
-	private GameViewThread m_thread;
-	
-	private GraphicObject m_Image;
-	
+	private GameViewThread m_thread;	
+	private GraphicObject m_Image;	
 	private IState m_state;
-	
 	
 	public GameView(Context context) {
 		super(context);
@@ -29,16 +31,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		AppManager.getInstance().setContext(context);
 		AppManager.getInstance().setGameView(this);
 		AppManager.getInstance().setResources(getResources());
-		
+		AppManager.getInstance().setHandler(m_handler);
+
 		getHolder().addCallback(this);
 		m_thread = new GameViewThread(getHolder(), this);
 		
 		ChangeGameState(new kr.comnic.ButtonBattle.IntroState());
+		
 	}
 	
 	public void OnDraw(Canvas canvas){
 		canvas.drawColor(Color.BLACK);
-		m_state.Render(canvas);
+		if(m_state != null)
+			m_state.Render(canvas);
 	}
 
 	@Override
@@ -59,6 +64,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// TODO Auto-generated method stub
+		Log.i("Surface", "Destroyed");
+		
 		boolean retry = true;
 		m_thread.setRunning(false);
 		while(retry){
@@ -68,7 +75,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			}catch(InterruptedException e){
 			}
 		}
-		
+		Log.i("Surface", "Destroyed Success!!");
 	}
 	
 	public void Vibrate(long milliseconds){
@@ -76,12 +83,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 	
 	public void Update(){
-		m_state.Update();
+		if(m_state != null)
+			m_state.Update();
 	}
 	
 	public void ChangeGameState(IState _state){
-		if(m_state != null)
+		if(m_state != null){
 			m_state.Destroy();
+			m_state = null;
+		}
 		_state.Init();
 		m_state = _state;
 	}
@@ -107,6 +117,46 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		return false;
 	}
 	
+	public void setRankInfoAlertDialog(){
+		final LinearLayout linear = (LinearLayout)View.inflate(AppManager.getInstance().getContext(), R.layout.rank_input, null);
+		linear.setVisibility(View.VISIBLE);
+		
+		new AlertDialog.Builder(AppManager.getInstance().getContext())
+		.setTitle("Game Over!")
+		.setIcon(R.drawable.icon)
+		.setView(linear)
+		.setPositiveButton("Save", new DialogInterface.OnClickListener() {
 
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				ChangeGameState(new kr.comnic.ButtonBattle.IntroState());
+				m_thread.setUpdate(true);
+			}
+			
+		
+		})
+		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				
+			}
+		})
+		.show();
+	}
 
+	Handler m_handler = new Handler() {
+		public void handleMessage(Message msg) {
+			if(msg.what == 0){
+				Log.i("Game Info", "GameOver Message Recieve!!");
+				ChangeGameState(new kr.comnic.ButtonBattle.IntroState());
+				/*일단 Intro로 가 버린당. */
+				//m_thread.setUpdate(false);
+				//setRankInfoAlertDialog();
+				
+			}
+		}
+	};
 }
