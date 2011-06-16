@@ -16,7 +16,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		// TODO Auto-generated method stub
-		db.execSQL("CREATE TABLE Rank(name CHAR(32) NOT NULL, clear_time INTEGER, life INTEGER, score INTEGER);");
+		db.execSQL("CREATE TABLE Rank(name CHAR(32) NOT NULL, score INTEGER, reg_date TEXT);");
 	}
 
 	@Override

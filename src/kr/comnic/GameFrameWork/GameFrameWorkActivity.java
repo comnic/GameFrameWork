@@ -7,6 +7,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.cauly.android.ad.AdInfo;
@@ -23,16 +24,17 @@ public class GameFrameWorkActivity extends Activity implements AdListener{
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         
         setContentView(R.layout.main);
-        RelativeLayout main_layout = (RelativeLayout)findViewById(R.id.main_layout);
-        main_layout.addView(new GameView(this));
-        
+        LinearLayout game_layout = (LinearLayout)findViewById(R.id.game_layout);
+        game_layout.addView(new GameView(this));
+
+        RelativeLayout ad_layout = (RelativeLayout)findViewById(R.id.ad_layout);        
         AdInfo ads_info = new AdInfo();
         //ads_info.initData("", adtype, gender, age, gps, effect, allowcall, reloadInterval)
         ads_info.initData("irmWTe609U", "CPC", "all", "all", "off", "circle", "no", 30);
         
         AdView adview = new AdView(this);
         adview.setAdListener(this);
-        main_layout.addView(adview);
+        ad_layout.addView(adview);
         
     }
 

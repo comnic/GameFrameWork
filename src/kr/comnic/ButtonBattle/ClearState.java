@@ -13,29 +13,15 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 public class ClearState implements IState {
-	DBHelper m_helper;
-	
-	private int m_time, m_life, m_point;
+	private int m_stage, m_time, m_life, m_point;
 	
 	private GraphicObject m_background; 
 
-	public ClearState(int _t, int _l, int _p){
+	public ClearState(int _s, int _t, int _l, int _p){
+		m_stage = _s;
 		m_time = _t;
 		m_life = _l;
 		m_point = _p;
-		
-		m_helper = new DBHelper(AppManager.getInstance().getGameView().getContext(), "rank.db", null, 1);
-		SQLiteDatabase db = m_helper.getWritableDatabase();
-		
-		ContentValues row = new ContentValues();
-		row.put("name", "Noname");
-		row.put("clear_time", _t);
-		row.put("life", _l);
-		row.put("score", _p);
-		
-		db.insert("Rank", null, row);
-		
-		db.close();
 	}
 	
 	@Override
@@ -59,11 +45,11 @@ public class ClearState implements IState {
 		//m_rankLayout.setVisibility(View.VISIBLE);
 		
 		Paint p = new Paint();
-		p.setTextSize(30);
+		p.setTextSize(35);
 		p.setColor(Color.BLACK);
-		canvas.drawText(String.format("%ds", m_time), 141, 347, p);
-		canvas.drawText(String.valueOf(m_life), 253, 347, p);
-		canvas.drawText(String.valueOf(m_point), 366, 347, p);
+		//canvas.drawText(String.format("%ds", m_time), 141, 347, p);
+		//canvas.drawText(String.valueOf(m_life), 253, 347, p);
+		canvas.drawText(String.valueOf(m_point), 280, 310, p);
 	}
 
 	@Override
@@ -81,7 +67,11 @@ public class ClearState implements IState {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		// TODO Auto-generated method stub
-		AppManager.getInstance().getGameView().ChangeGameState(new GameState(m_point));
+		float _x = event.getX();
+		float _y = event.getY();
+		
+		if((_x >= 110 && _x <= 350) && (_y >= 600 && _y <= 680))
+			AppManager.getInstance().getGameView().ChangeGameState(new GameState(++m_stage, m_point));
 		return true;
 	}
 

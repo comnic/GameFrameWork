@@ -15,13 +15,24 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 public class GameState implements IState {
+	private final int GAME_BUTTON_ROW = 8;
+	private final int GAME_BUTTON_COL = 7;
+
+	private final int GAME_FIRST_BUTTON_X = 15;
+	private final int GAME_FIRST_BUTTON_Y = 165;
+	
+	private final int GAME_BUTTON_SIZE_WIDTH = 64;
+	private final int GAME_BUTTON_SIZE_HEIGHT = 64;
+
 	private final int GAME_INIT_MODE_ALL = 0;
 	private final int GAME_INIT_MODE_GREEN = 1;
 	
+	private int m_stage = 1;
 	private int m_score = 0;		//점수
 	private int m_limitTime = 30;	//게임에 주어진 시간
 	private int m_curTime = 0;		//남은 시간
 	private int m_life = 15;		//생명 수
+	private int m_clickCnt = 0;
 	
 	private long m_startGameTime;	//시작시간
 	private long m_curGameTime;		//현재시간
@@ -60,8 +71,9 @@ public class GameState implements IState {
 	public GameState(){
 		Log.i("Game Info", "GameState GameState()");
 	}
-	public GameState(int _baseScore){
+	public GameState(int _stage, int _baseScore){
 		Log.i("Game Info", "GameState GameState(int)");
+		setStage(_stage);
 		m_score = _baseScore;
 	}
 	
@@ -83,7 +95,20 @@ public class GameState implements IState {
 		m_isFail = false;	//게임을 실패 했는지 유무
 		m_isGameOver = false;
 
-		m_bi = new ButtonItem[9][7];
+		
+		/* ButtonItem배열
+		[0,0,0,0,0,0,0]
+		[0,0,0,0,0,0,0]
+		[0,0,0,0,0,0,0]
+		[0,0,0,0,0,0,0]
+		[0,0,0,0,0,0,0]
+		[0,0,0,0,0,0,0]
+		[0,0,0,0,0,0,0]
+		[0,0,0,0,0,0,0]
+		[0,0,0,0,0,0,0]
+	 * 
+	 */
+		m_bi = new ButtonItem[GAME_BUTTON_ROW][GAME_BUTTON_COL];
 		
 		//ButtonItem배열을 초기화 한다.
 		//해당위치에 표시될 버튼으르 랜덤으로 설정한다.
@@ -170,19 +195,6 @@ public class GameState implements IState {
 		m_numGreen[8] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.green_8));
 		m_numGreen[9] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.green_9));
 		
-		/* ButtonItem배열
-			[0,0,0,0,0,0,0]
-			[0,0,0,0,0,0,0]
-			[0,0,0,0,0,0,0]
-			[0,0,0,0,0,0,0]
-			[0,0,0,0,0,0,0]
-			[0,0,0,0,0,0,0]
-			[0,0,0,0,0,0,0]
-			[0,0,0,0,0,0,0]
-			[0,0,0,0,0,0,0]
-			[0,0,0,0,0,0,0]
-		 * 
-		 */
 	}
 
 	@Override
@@ -202,11 +214,11 @@ public class GameState implements IState {
 		__x = __y = 0;
 		int __x2, __y2;
 		
-		for(int y = 0 ; y < 9 ; y++){
-			for(int x = 0 ; x < 7 ; x++){
+		for(int y = 0 ; y < GAME_BUTTON_ROW ; y++){
+			for(int x = 0 ; x < GAME_BUTTON_COL ; x++){
 				//버튼 그릴 좌표
-				__x = 15 + 64*x;
-				__y = 185 + 64*y;
+				__x = GAME_FIRST_BUTTON_X + GAME_BUTTON_SIZE_WIDTH * x;
+				__y = GAME_FIRST_BUTTON_Y + GAME_BUTTON_SIZE_WIDTH * y;
 				
 				//숫자 그려줄 좌표
 				__x2 = __x + 44;
@@ -291,18 +303,18 @@ public class GameState implements IState {
 			m_curTime = m_limitTime - (int)((m_curGameTime - m_startGameTime)/1000);
 	
 			//특정시간마다 그린색을 다시 다른 색으로 바꿔 준다.
-			if(m_isInitGame && ((m_curGameTime/1000) % 5) == 0)
+			if(m_isInitGame && ((m_curGameTime/1000) % 10) == 0)
 				initButtonItem(GAME_INIT_MODE_GREEN);
 	
 			if(m_isGameOver){
 				GameOver();
 			}else if(m_isClear){
 				Log.i("Game Info", "Clear!!");
-				AppManager.getInstance().getGameView().ChangeGameState(new ClearState(m_curTime, m_life, m_score));
+				AppManager.getInstance().getGameView().ChangeGameState(new ClearState(m_stage, m_curTime, m_life, m_score));
 			}else if(m_isFail){
 				Log.i("Game Info", "Game Over!!");
-				//임시로...
-				AppManager.getInstance().getGameView().ChangeGameState(new ClearState(m_curTime, m_life, m_score));
+				//
+				AppManager.getInstance().getGameView().ChangeGameState(new GameOverState(m_score));
 
 				/*
 				Message msg = new Message();
@@ -373,12 +385,12 @@ public class GameState implements IState {
 	 * 클릭된 좌표를 값으로 버튼 클릭을 처리한다.
 	 */
 	private void clickProcess(float _x, float _y){
-		if(_x < 15 || _x > 462) return ;
-		if(_y < 185 || _y > 760) return ;
+		if(_x < GAME_FIRST_BUTTON_X || _x > 462) return ;
+		if(_y < GAME_FIRST_BUTTON_Y || _y > 760) return ;
 		if(m_isClear) return;
 
-		int _indexX = (int)((_x-15)/64.0);
-		int _indexY = (int)((_y-185)/64.0);
+		int _indexX = (int)((_x-GAME_FIRST_BUTTON_X)/GAME_BUTTON_SIZE_WIDTH);
+		int _indexY = (int)((_y-GAME_FIRST_BUTTON_Y)/GAME_BUTTON_SIZE_HEIGHT);
 
 		//Log.i("Touch", String.format("[%d, %d] - (%f, %f)", _indexX, _indexY, _x, _y));
 		
@@ -387,8 +399,9 @@ public class GameState implements IState {
 				AppManager.getInstance().getGameView().Vibrate(100);
 				if(m_life > 0)	//마지막에 -1로 표시되지 않게 하기 위해.
 					m_life -= 1;
-			}else
+			}else{
 				m_bi[_indexY][_indexX].click();
+			}
 		}catch (Exception e) {
 			;// TODO: handle exception
 		}
@@ -397,11 +410,16 @@ public class GameState implements IState {
 	
 	private boolean isClear(){
 		if(m_isInitGame){
-			for(int y = 0 ; y < 9 ; y++)
-				for(int x = 0 ; x < 7 ; x++)
+			/*이거 이제 현실적으로 불가능하게 됐당...ㅋㅋ
+			 * 
+			for(int y = 0 ; y < GAME_BUTTON_ROW ; y++)
+				for(int x = 0 ; x < GAME_BUTTON_COL ; x++)
 					if(m_bi[y][x] != null && m_bi[y][x].getKind() != ButtonItem.BUTTON_KIND_GREEN)
 						return false;		
 			m_isClear = true;
+			 */
+			if(m_clickCnt < (m_stage * 10))
+				return false;
 		}
 		return true;
 	}
@@ -409,8 +427,8 @@ public class GameState implements IState {
 	private void initButtonItem(int _mode){
 		Random rand = new Random();
 		
-		for(int y = 0 ; y < 9 ; y++){
-			for(int x = 0 ; x < 7 ; x++){
+		for(int y = 0 ; y < GAME_BUTTON_ROW ; y++){
+			for(int x = 0 ; x < GAME_BUTTON_COL ; x++){
 				if(_mode == GAME_INIT_MODE_GREEN){
 					if(m_bi[y][x] != null)
 						if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_GREEN)
@@ -425,6 +443,12 @@ public class GameState implements IState {
 	}
 
 	private void drawInfo(Canvas canvas){
+		////////////////////////////////////////////////////////////
+		//stage을 표시한다.
+		////////////////////////////////////////////////////////////
+		String _strStage = String.valueOf(m_stage); //일단 String형으로 바꾼다.
+		drawStringNumber(canvas, _strStage, 427, 31, 20);
+
 		////////////////////////////////////////////////////////////
 		//시간을 표시한다.
 		////////////////////////////////////////////////////////////
@@ -484,6 +508,9 @@ public class GameState implements IState {
 	
 	public void addScore(int n){
 		m_score += n;
+		
+		//버튼당 클릭수가 완료되면 호출되므로 여기다 카운트 한다.
+		m_clickCnt++;
 	}
 
 	public void addLife(int n){
@@ -494,5 +521,16 @@ public class GameState implements IState {
 	public void addTime(int n){
 		m_limitTime += n;
 		Log.i("Game Info", String.format("m_limitTime : %d", m_limitTime));
+	}
+
+	public void setStage(int _stage) {
+		if(_stage <= 0)
+			this.m_stage = 1;
+		else
+			this.m_stage = _stage;
+	}
+
+	public int getStage() {
+		return m_stage;
 	}
 }

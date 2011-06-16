@@ -29,7 +29,7 @@ public class ButtonItem {
 		//에너지를 5올려준다.
 		case BUTTON_KIND_SPECIAL1:
 			m_kind = BUTTON_KIND_SPECIAL1;
-			m_clickCount = 0;
+			m_clickCount = 3;
 			m_point = 0;
 			break;
 		//2번 클릭에 3점
@@ -101,7 +101,7 @@ public class ButtonItem {
 		if(--m_clickCount <= 0){
 			//주어진 점수를 더한다.
 			((GameState)AppManager.getInstance().getGameView().getGameState()).addScore(m_point);
-			
+
 			switch(m_kind){
 			case BUTTON_KIND_SPECIAL1:
 				((GameState)AppManager.getInstance().getGameView().getGameState()).addLife(5);
