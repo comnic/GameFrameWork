@@ -24,7 +24,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	public GameView(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
-		
+		Log.i("GameView", "GameView Constructor");
+
 		setFocusable(true);
 		m_vibrator = (Vibrator)context.getSystemService(Context.VIBRATOR_SERVICE);
 		
@@ -56,8 +57,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO Auto-generated method stub
-		m_thread.setRunning(true);
-		m_thread.start();
+		Log.i("Surface", "Created");
+		try{
+			if(!m_thread.isAlive()){
+				m_thread.setRunning(true);
+				m_thread.setUpdate(true);
+
+				m_thread.start();
+			}else{
+				m_thread.setUpdate(true);
+			}
+			
+		}catch (Exception e) {
+			// TODO: handle exception
+		}
 		
 	}
 
@@ -67,7 +80,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		Log.i("Surface", "Destroyed");
 		
 		boolean retry = true;
-		m_thread.setRunning(false);
+		//m_thread.setRunning(false);
+		m_thread.setUpdate(false);
+/*		
 		while(retry){
 			try{
 				m_thread.join();
@@ -75,6 +90,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			}catch(InterruptedException e){
 			}
 		}
+*/		
 		Log.i("Surface", "Destroyed Success!!");
 	}
 	

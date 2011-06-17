@@ -57,8 +57,10 @@ public class GameOverState implements IState {
 			m_rankList.add(new RankItem(null, cursor.getInt(0), cursor.getString(1)));
 		}
 
-		db = m_helper.getWritableDatabase();
-		db.execSQL(String.format("DELETE FROM Rank WHERE score < %d;", m_rankList.get(m_rankList.size()-1).score));
+		if(!m_rankList.isEmpty()){
+			db = m_helper.getWritableDatabase();
+			db.execSQL(String.format("DELETE FROM Rank WHERE score < %d;", m_rankList.get(m_rankList.size()-1).score));
+		}
 		
 		db.close();
 	}

@@ -7,7 +7,6 @@ import kr.comnic.GameFrameWork.GraphicObject;
 import kr.comnic.GameFrameWork.IState;
 import kr.comnic.GameFrameWork.R;
 import android.graphics.Canvas;
-import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -115,7 +114,7 @@ public class GameState implements IState {
 		initButtonItem(GAME_INIT_MODE_ALL);
 		
 		//게임 시작 시간을 저장한다. 현재시간을 밀리초로 기록.
-		m_startGameTime = System.currentTimeMillis();
+		m_curGameTime = m_startGameTime = System.currentTimeMillis();
 		
 		//배경으로 사용될 이미지 
 		m_background = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.background));
@@ -300,10 +299,12 @@ public class GameState implements IState {
 	public void Update() {
 		// TODO Auto-generated method stub
 		if(m_isInitGame){
-			m_curTime = m_limitTime - (int)((m_curGameTime - m_startGameTime)/1000);
+			int progressTime = (int)((m_curGameTime - m_startGameTime)/1000);
+			m_curTime = m_limitTime - progressTime;
 	
 			//특정시간마다 그린색을 다시 다른 색으로 바꿔 준다.
-			if(m_isInitGame && ((m_curGameTime/1000) % 10) == 0)
+			int chkTime = progressTime % 10;
+			if(m_isInitGame && chkTime == 0)
 				initButtonItem(GAME_INIT_MODE_GREEN);
 	
 			if(m_isGameOver){
@@ -418,21 +419,44 @@ public class GameState implements IState {
 						return false;		
 			m_isClear = true;
 			 */
-			if(m_clickCnt < (m_stage * 10))
+			if(m_clickCnt < (m_stage * 15))
 				return false;
 		}
 		return true;
 	}
 	
 	private void initButtonItem(int _mode){
+		Log.i("Game Info", "initButton");
 		Random rand = new Random();
+		int nRand = 0, randKind = 0;
 		
 		for(int y = 0 ; y < GAME_BUTTON_ROW ; y++){
 			for(int x = 0 ; x < GAME_BUTTON_COL ; x++){
 				if(_mode == GAME_INIT_MODE_GREEN){
 					if(m_bi[y][x] != null)
-						if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_GREEN)
-							m_bi[y][x] = new ButtonItem(rand.nextInt(9));
+						if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_GREEN){													
+							nRand = rand.nextInt(100);
+							Log.i("Random!!!!!!!!", String.valueOf(nRand));
+							if(nRand >= 0 && nRand <= 5)
+								randKind = ButtonItem.BUTTON_KIND_SPECIAL1;
+							else if(nRand >= 6 && nRand <= 10)
+								randKind = ButtonItem.BUTTON_KIND_SPECIAL2;
+							else if(nRand >= 11 && nRand <= 15)
+								randKind = ButtonItem.BUTTON_KIND_SPECIAL3;
+							else if(nRand >= 16 && nRand <= 20)
+								randKind = ButtonItem.BUTTON_KIND_SPECIAL4;
+							else if(nRand >= 21 && nRand <= 25)
+								randKind = ButtonItem.BUTTON_KIND_SPECIAL5;
+							else if(nRand >= 26 && nRand <= 30)
+								randKind = ButtonItem.BUTTON_KIND_STAR;
+							else if(nRand >= 31 && nRand <= 35)
+								randKind = ButtonItem.BUTTON_KIND_TIME;
+							else if(nRand >= 36 && nRand <= 60)
+								randKind = ButtonItem.BUTTON_KIND_RED;
+							else 
+								randKind = ButtonItem.BUTTON_KIND_GREEN;
+							m_bi[y][x] = new ButtonItem(randKind);
+						}
 				}else if(_mode == GAME_INIT_MODE_ALL){
 					m_bi[y][x] = new ButtonItem(rand.nextInt(9));
 				}
