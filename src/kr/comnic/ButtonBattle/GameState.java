@@ -14,6 +14,9 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 public class GameState implements IState {
+	public static final int GAME_LEVEL_EASY = 1;
+	public static final int GAME_LEVEL_HARD = 3;
+	
 	private final int GAME_BUTTON_ROW = 8;
 	private final int GAME_BUTTON_COL = 7;
 
@@ -60,6 +63,10 @@ public class GameState implements IState {
 	private GraphicObject m_numMinus;
 
 	private GraphicObject m_background;
+	private GraphicObject m_easy_background;
+	private GraphicObject m_inner_background;
+	
+	//ButtonItem배열
 	private ButtonItem m_bi[][];
 	
 	@Override
@@ -68,17 +75,17 @@ public class GameState implements IState {
 	}
 
 	public GameState(){
-		Log.i("Game Info", "GameState GameState()");
+		//Log.i("Game Info", "GameState GameState()");
 	}
 	public GameState(int _stage, int _baseScore){
-		Log.i("Game Info", "GameState GameState(int)");
+		//Log.i("Game Info", "GameState GameState(int)");
 		setStage(_stage);
 		m_score = _baseScore;
 	}
 	
 	@Override
 	public void Init() {
-		Log.i("Game Info", "GameState Init()");
+		//Log.i("Game Info", "GameState Init()");
 		// TODO Auto-generated method stub
 		/*
 		m_isClear = false;
@@ -118,6 +125,8 @@ public class GameState implements IState {
 		
 		//배경으로 사용될 이미지 
 		m_background = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.background));
+		m_easy_background = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.easy_background));
+		m_inner_background = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.inner_background));
 		
 		//정보(시간, 점수 등)표시할 숫자와 마이너스 기호
 		m_numBlack = new GraphicObject[10];
@@ -201,98 +210,17 @@ public class GameState implements IState {
 		// TODO Auto-generated method stub
 		
 		//배경을 먼저 그린다.
-		m_background.Draw(canvas);
+		if(m_stage < GAME_LEVEL_HARD)
+			m_easy_background.Draw(canvas);
+		else
+			m_background.Draw(canvas);
 		
 		//정보를 그린다.
 		drawInfo(canvas);
 		
-		/*
-		 * 배열 크기만큼 버튼들을 속성에 맞게 그린다.
-		 */
-		int __x, __y;
-		__x = __y = 0;
-		int __x2, __y2;
-		
-		for(int y = 0 ; y < GAME_BUTTON_ROW ; y++){
-			for(int x = 0 ; x < GAME_BUTTON_COL ; x++){
-				//버튼 그릴 좌표
-				__x = GAME_FIRST_BUTTON_X + GAME_BUTTON_SIZE_WIDTH * x;
-				__y = GAME_FIRST_BUTTON_Y + GAME_BUTTON_SIZE_WIDTH * y;
-				
-				//숫자 그려줄 좌표
-				__x2 = __x + 44;
-				__y2 = __y + 44;
-				
-		try{
-				if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_GREEN){
-					m_BtnGreen.setPosition(__x, __y);
-					m_BtnGreen.Draw(canvas);
-				}
-				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_RED){
-					m_BtnRed.setPosition(__x, __y);
-					m_BtnRed.Draw(canvas);
-					
-					m_numRed[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
-					m_numRed[m_bi[y][x].getClickCount()].Draw(canvas);
-				}
-				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL1){
-					m_BtnSpc1.setPosition(__x, __y);
-					m_BtnSpc1.Draw(canvas);
-					
-					m_numBlue[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
-					m_numBlue[m_bi[y][x].getClickCount()].Draw(canvas);
-				}
-				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL2){
-					m_BtnSpc2.setPosition(__x, __y);
-					m_BtnSpc2.Draw(canvas);
+		//버튼을 그린다.
+		drawButton(canvas);
 
-					m_numBlue[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
-					m_numBlue[m_bi[y][x].getClickCount()].Draw(canvas);
-				}
-				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL3){
-					m_BtnSpc3.setPosition(__x, __y);
-					m_BtnSpc3.Draw(canvas);
-
-					m_numYellow[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
-					m_numYellow[m_bi[y][x].getClickCount()].Draw(canvas);
-				}
-				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL4){
-					m_BtnSpc4.setPosition(__x, __y);
-					m_BtnSpc4.Draw(canvas);
-
-					m_numGreen[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
-					m_numGreen[m_bi[y][x].getClickCount()].Draw(canvas);
-				}
-				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL5){
-					m_BtnSpc5.setPosition(__x, __y);
-					m_BtnSpc5.Draw(canvas);
-
-					m_numRed[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
-					m_numRed[m_bi[y][x].getClickCount()].Draw(canvas);
-				}
-				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_STAR){
-					m_BtnStar.setPosition(__x, __y);
-					m_BtnStar.Draw(canvas);
-
-					m_numBlue[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
-					m_numBlue[m_bi[y][x].getClickCount()].Draw(canvas);
-				}
-				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_TIME){
-					m_BtnTime.setPosition(__x, __y);
-					m_BtnTime.Draw(canvas);
-
-					m_numBlue[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
-					m_numBlue[m_bi[y][x].getClickCount()].Draw(canvas);
-
-				}				
-				else continue;
-			
-		}catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-			}
-		}
 	}
 
 	@Override
@@ -310,10 +238,10 @@ public class GameState implements IState {
 			if(m_isGameOver){
 				GameOver();
 			}else if(m_isClear){
-				Log.i("Game Info", "Clear!!");
+				//Log.i("Game Info", "Clear!!");
 				AppManager.getInstance().getGameView().ChangeGameState(new ClearState(m_stage, m_curTime, m_life, m_score));
 			}else if(m_isFail){
-				Log.i("Game Info", "Game Over!!");
+				//Log.i("Game Info", "Game Over!!");
 				//
 				AppManager.getInstance().getGameView().ChangeGameState(new GameOverState(m_score));
 
@@ -323,7 +251,7 @@ public class GameState implements IState {
 				AppManager.getInstance().getHandler().sendMessageAtFrontOfQueue(msg);
 				*/
 			}else{
-				Log.i("Game Info", "Continue!!");
+				//Log.i("Game Info", "Continue!!");
 				m_isClear = isClear();
 	
 				if(m_curTime <= 0 || m_life <= 0)
@@ -426,17 +354,24 @@ public class GameState implements IState {
 	}
 	
 	private void initButtonItem(int _mode){
-		Log.i("Game Info", "initButton");
+		//Log.i("Game Info", "initButton");
 		Random rand = new Random();
 		int nRand = 0, randKind = 0;
 		
 		for(int y = 0 ; y < GAME_BUTTON_ROW ; y++){
 			for(int x = 0 ; x < GAME_BUTTON_COL ; x++){
+				if(m_stage < GAME_LEVEL_HARD){
+					if((y < 2 || y > GAME_BUTTON_ROW - 2) || (x < 1 || x > GAME_BUTTON_COL - 2)){
+						m_bi[y][x] = new ButtonItem(ButtonItem.BUTTON_KIND_BLOCK);
+						continue;
+					}
+				}
+				
 				if(_mode == GAME_INIT_MODE_GREEN){
 					if(m_bi[y][x] != null)
 						if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_GREEN){													
 							nRand = rand.nextInt(100);
-							Log.i("Random!!!!!!!!", String.valueOf(nRand));
+							//Log.i("Random!!!!!!!!", String.valueOf(nRand));
 							if(nRand >= 0 && nRand <= 5)
 								randKind = ButtonItem.BUTTON_KIND_SPECIAL1;
 							else if(nRand >= 6 && nRand <= 10)
@@ -499,6 +434,99 @@ public class GameState implements IState {
 		*/
 	}
 	
+	private void drawButton(Canvas canvas){
+		/*
+		 * 배열 크기만큼 버튼들을 속성에 맞게 그린다.
+		 */
+		int __x, __y;
+		__x = __y = 0;
+		int __x2, __y2;
+		
+		for(int y = 0 ; y < GAME_BUTTON_ROW ; y++){
+			for(int x = 0 ; x < GAME_BUTTON_COL ; x++){
+				//버튼 그릴 좌표
+				__x = GAME_FIRST_BUTTON_X + GAME_BUTTON_SIZE_WIDTH * x;
+				__y = GAME_FIRST_BUTTON_Y + GAME_BUTTON_SIZE_WIDTH * y;
+				
+				//숫자 그려줄 좌표
+				__x2 = __x + 44;
+				__y2 = __y + 44;
+				
+		try{
+				if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_BLOCK){
+					continue;
+				}
+				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_GREEN){
+					m_BtnGreen.setPosition(__x, __y);
+					m_BtnGreen.Draw(canvas);
+				}
+				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_RED){
+					m_BtnRed.setPosition(__x, __y);
+					m_BtnRed.Draw(canvas);
+					
+					m_numRed[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
+					m_numRed[m_bi[y][x].getClickCount()].Draw(canvas);
+				}
+				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL1){
+					m_BtnSpc1.setPosition(__x, __y);
+					m_BtnSpc1.Draw(canvas);
+					
+					m_numBlue[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
+					m_numBlue[m_bi[y][x].getClickCount()].Draw(canvas);
+				}
+				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL2){
+					m_BtnSpc2.setPosition(__x, __y);
+					m_BtnSpc2.Draw(canvas);
+
+					m_numBlue[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
+					m_numBlue[m_bi[y][x].getClickCount()].Draw(canvas);
+				}
+				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL3){
+					m_BtnSpc3.setPosition(__x, __y);
+					m_BtnSpc3.Draw(canvas);
+
+					m_numYellow[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
+					m_numYellow[m_bi[y][x].getClickCount()].Draw(canvas);
+				}
+				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL4){
+					m_BtnSpc4.setPosition(__x, __y);
+					m_BtnSpc4.Draw(canvas);
+
+					m_numGreen[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
+					m_numGreen[m_bi[y][x].getClickCount()].Draw(canvas);
+				}
+				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL5){
+					m_BtnSpc5.setPosition(__x, __y);
+					m_BtnSpc5.Draw(canvas);
+
+					m_numRed[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
+					m_numRed[m_bi[y][x].getClickCount()].Draw(canvas);
+				}
+				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_STAR){
+					m_BtnStar.setPosition(__x, __y);
+					m_BtnStar.Draw(canvas);
+
+					m_numBlue[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
+					m_numBlue[m_bi[y][x].getClickCount()].Draw(canvas);
+				}
+				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_TIME){
+					m_BtnTime.setPosition(__x, __y);
+					m_BtnTime.Draw(canvas);
+
+					m_numBlue[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
+					m_numBlue[m_bi[y][x].getClickCount()].Draw(canvas);
+
+				}				
+				else continue;
+			
+		}catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+			}
+		}
+	}
+	
 	public void drawStringNumber(Canvas _canvas, String _strNumber, int _offsetX, int _offsetY, int _numValue){
 		int _index;
 		int n = 0;
@@ -539,12 +567,12 @@ public class GameState implements IState {
 
 	public void addLife(int n){
 		m_life += n;
-		Log.i("Game Info", String.format("m_life : %d", m_life));
+		//Log.i("Game Info", String.format("m_life : %d", m_life));
 	}
 
 	public void addTime(int n){
 		m_limitTime += n;
-		Log.i("Game Info", String.format("m_limitTime : %d", m_limitTime));
+		//Log.i("Game Info", String.format("m_limitTime : %d", m_limitTime));
 	}
 
 	public void setStage(int _stage) {

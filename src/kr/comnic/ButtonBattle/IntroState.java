@@ -49,7 +49,7 @@ public class IntroState implements IState {
 	public boolean onTouchEvent(MotionEvent event) {
 		// TODO Auto-generated method stub
 		Log.i("Game Info", "onTouchEvent!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		AppManager.getInstance().getGameView().ChangeGameState(new GameState());
+		AppManager.getInstance().getGameView().ChangeGameState(new MainMenuState());
 		return true;
 	}
 

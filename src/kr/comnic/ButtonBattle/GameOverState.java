@@ -112,7 +112,7 @@ public class GameOverState implements IState {
 		float _y = event.getY();
 		
 		if((_x >= 110 && _x <= 350) && (_y >= 600 && _y <= 680))
-			AppManager.getInstance().getGameView().ChangeGameState(new GameState());
+			AppManager.getInstance().getGameView().ChangeGameState(new MainMenuState());
 
 		return false;
 	}

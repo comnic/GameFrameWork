@@ -3,6 +3,7 @@ package kr.comnic.ButtonBattle;
 import kr.comnic.GameFrameWork.AppManager;
 
 public class ButtonItem {
+	public static final int BUTTON_KIND_BLOCK 		= -1;
 	public static final int BUTTON_KIND_GREEN 		= 0;
 	public static final int BUTTON_KIND_RED 		= 1;
 	public static final int BUTTON_KIND_SPECIAL1 	= 2;
@@ -20,6 +21,12 @@ public class ButtonItem {
 	
 	public ButtonItem(int _kind){
 		switch(_kind){
+		//BLOCK으로 그리지 않는 버튼.
+		case BUTTON_KIND_BLOCK:
+			m_kind = BUTTON_KIND_BLOCK;
+			m_clickCount = 10000000;
+			m_point = 0;
+			break;
 		//빨간 버튼, 기본적인 버튼으로 1번 클릭에 1점.
 		case BUTTON_KIND_RED:
 			m_kind = BUTTON_KIND_RED;
