@@ -91,6 +91,7 @@ public class GameFrameWorkActivity extends Activity implements AdListener, AdHtt
     
 	@Override
 	public void onFailedToReceiveAd(boolean arg0) {
+		// TODO Auto-generated method stub
 		net.daum.mobilead.AdConfig.setClientId("a1fZ08T130b7a176e6");
 		m_adamADView = new MobileAdView(this);
 		
@@ -98,9 +99,7 @@ public class GameFrameWorkActivity extends Activity implements AdListener, AdHtt
 		m_adamADView.setVisibility(View.VISIBLE);
 		
 		m_caulyADView.setVisibility(View.GONE);
-		m_adLayout.addView(m_adamADView);
-		// TODO Auto-generated method stub
-		
+		m_adLayout.addView(m_adamADView);	
 	}
 
 	@Override

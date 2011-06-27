@@ -4,6 +4,7 @@ import java.util.Random;
 
 import kr.comnic.GameFrameWork.AppManager;
 import kr.comnic.GameFrameWork.GraphicObject;
+import kr.comnic.GameFrameWork.GraphicSetObject;
 import kr.comnic.GameFrameWork.IState;
 import kr.comnic.GameFrameWork.R;
 import android.graphics.Canvas;
@@ -43,6 +44,8 @@ public class GameState implements IState {
 	private boolean m_isClear = false;	//게임을 클리어 했는지 유무
 	private boolean m_isFail = false;	//게임을 실패 했는지 유무
 	private boolean m_isGameOver = false;
+	
+	private GraphicSetObject m_btnSet001;
 	
 	private GraphicObject m_BtnGreen;
 	private GraphicObject m_BtnRed;
@@ -142,6 +145,9 @@ public class GameState implements IState {
 		m_numBlack[9] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.n9));		
 
 		m_numMinus = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.minus));
+		
+		//게임에 사용될 버튼 세트.
+		m_btnSet001 = new GraphicSetObject(AppManager.getInstance().getBitmap(R.drawable.btn_list_001));
 		
 		//게임에 사용될 버튼들.
 		m_BtnGreen = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.btn_green));
