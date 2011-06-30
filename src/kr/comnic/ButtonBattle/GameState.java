@@ -7,6 +7,7 @@ import kr.comnic.GameFrameWork.GraphicObject;
 import kr.comnic.GameFrameWork.GraphicSetObject;
 import kr.comnic.GameFrameWork.IState;
 import kr.comnic.GameFrameWork.R;
+import kr.comnic.GameFrameWork.SoundManager;
 import android.graphics.Canvas;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -146,8 +147,12 @@ public class GameState implements IState {
 
 		m_numMinus = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.minus));
 		
+		SoundManager.getInstance().Init(AppManager.getInstance().getContext());		
+		SoundManager.getInstance().addSound(0, R.raw.click2);
+		
 		//게임에 사용될 버튼 세트.
 		m_btnSet001 = new GraphicSetObject(AppManager.getInstance().getBitmap(R.drawable.btn_list_001));
+		m_btnSet001.InitSprite(64, 64, 5);
 		
 		//게임에 사용될 버튼들.
 		m_BtnGreen = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.btn_green));
@@ -209,6 +214,7 @@ public class GameState implements IState {
 		m_numGreen[8] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.green_8));
 		m_numGreen[9] = new GraphicObject(AppManager.getInstance().getBitmap(R.drawable.green_9));
 		
+		//SoundManager.getInstance().addSound(0, R.raw.clcik1);
 	}
 
 	@Override
@@ -296,6 +302,9 @@ public class GameState implements IState {
 		 * 멀티터치용으로 만들었는데 잘 안 되는 듯.
 		 * Test가 필요함.
 		 */
+		
+		SoundManager.getInstance().play(0);
+		
 		if(event.getPointerCount() > 1){	//1보다 크면 멀티터치로 인식
 			//첫번째 터치 처리
 			float _x = event.getX(0);
@@ -463,61 +472,116 @@ public class GameState implements IState {
 					continue;
 				}
 				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_GREEN){
+					/*
 					m_BtnGreen.setPosition(__x, __y);
 					m_BtnGreen.Draw(canvas);
+					*/
+					
+					m_btnSet001.setPosition(__x, __y);
+					m_btnSet001.setCurFrame(ButtonItem.BUTTON_KIND_GREEN);
+					m_btnSet001.Draw(canvas);
+					
 				}
 				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_RED){
+					/*
 					m_BtnRed.setPosition(__x, __y);
 					m_BtnRed.Draw(canvas);
+					*/
+
+					m_btnSet001.setPosition(__x, __y);
+					m_btnSet001.setCurFrame(ButtonItem.BUTTON_KIND_RED);
+					m_btnSet001.Draw(canvas);					
 					
 					m_numRed[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
 					m_numRed[m_bi[y][x].getClickCount()].Draw(canvas);
 				}
 				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL1){
+					/*
 					m_BtnSpc1.setPosition(__x, __y);
 					m_BtnSpc1.Draw(canvas);
+					*/
 					
+					m_btnSet001.setPosition(__x, __y);
+					m_btnSet001.setCurFrame(ButtonItem.BUTTON_KIND_SPECIAL1);
+					m_btnSet001.Draw(canvas);					
+
 					m_numBlue[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
 					m_numBlue[m_bi[y][x].getClickCount()].Draw(canvas);
 				}
 				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL2){
+					/*
 					m_BtnSpc2.setPosition(__x, __y);
 					m_BtnSpc2.Draw(canvas);
+					*/
+
+					m_btnSet001.setPosition(__x, __y);
+					m_btnSet001.setCurFrame(ButtonItem.BUTTON_KIND_SPECIAL2);
+					m_btnSet001.Draw(canvas);					
 
 					m_numBlue[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
 					m_numBlue[m_bi[y][x].getClickCount()].Draw(canvas);
 				}
 				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL3){
+					/*
 					m_BtnSpc3.setPosition(__x, __y);
 					m_BtnSpc3.Draw(canvas);
+					*/
+
+					m_btnSet001.setPosition(__x, __y);
+					m_btnSet001.setCurFrame(ButtonItem.BUTTON_KIND_SPECIAL3);
+					m_btnSet001.Draw(canvas);					
 
 					m_numYellow[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
 					m_numYellow[m_bi[y][x].getClickCount()].Draw(canvas);
 				}
 				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL4){
+					/*
 					m_BtnSpc4.setPosition(__x, __y);
 					m_BtnSpc4.Draw(canvas);
+					*/
+
+					m_btnSet001.setPosition(__x, __y);
+					m_btnSet001.setCurFrame(ButtonItem.BUTTON_KIND_SPECIAL3);
+					m_btnSet001.Draw(canvas);					
 
 					m_numGreen[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
 					m_numGreen[m_bi[y][x].getClickCount()].Draw(canvas);
 				}
 				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_SPECIAL5){
+					/*
 					m_BtnSpc5.setPosition(__x, __y);
 					m_BtnSpc5.Draw(canvas);
+					*/
+
+					m_btnSet001.setPosition(__x, __y);
+					m_btnSet001.setCurFrame(ButtonItem.BUTTON_KIND_SPECIAL3);
+					m_btnSet001.Draw(canvas);					
 
 					m_numRed[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
 					m_numRed[m_bi[y][x].getClickCount()].Draw(canvas);
 				}
 				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_STAR){
+					/*
 					m_BtnStar.setPosition(__x, __y);
 					m_BtnStar.Draw(canvas);
+					*/
+					
+					m_btnSet001.setPosition(__x, __y);
+					m_btnSet001.setCurFrame(ButtonItem.BUTTON_KIND_SPECIAL3);
+					m_btnSet001.Draw(canvas);					
 
 					m_numBlue[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
 					m_numBlue[m_bi[y][x].getClickCount()].Draw(canvas);
 				}
 				else if(m_bi[y][x].getKind() == ButtonItem.BUTTON_KIND_TIME){
+					/*
 					m_BtnTime.setPosition(__x, __y);
 					m_BtnTime.Draw(canvas);
+					*/
+					
+					m_btnSet001.setPosition(__x, __y);
+					m_btnSet001.setCurFrame(ButtonItem.BUTTON_KIND_SPECIAL3);
+					m_btnSet001.Draw(canvas);					
 
 					m_numBlue[m_bi[y][x].getClickCount()].setPosition(__x2, __y2);
 					m_numBlue[m_bi[y][x].getClickCount()].Draw(canvas);
